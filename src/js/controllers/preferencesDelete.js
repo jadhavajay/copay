@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('preferencesDeleteWalletController',
-  function($scope, $ionicHistory, gettextCatalog, lodash, profileService, $state, ongoingProcess, popupService) {
+  function($scope, $ionicHistory, gettextCatalog, urlService,lodash,$http, profileService, $state, ongoingProcess, popupService, pushNotificationsService) {
     
     $scope.$on("$ionicView.beforeEnter", function(event, data) {
       if (!data.stateParams || !data.stateParams.walletId) {
@@ -36,6 +36,9 @@ angular.module('copayApp.controllers').controller('preferencesDeleteWalletContro
         if (err) {
           popupService.showAlert(gettextCatalog.getString('Error'), err.message || err);
         } else {
+
+          deleteWalletFromServer($scope.wallet.credentials.walletId);
+          pushNotificationsService.unsubscribe($scope.wallet);
           $ionicHistory.nextViewOptions({
             disableAnimate: true,
             historyRoot: true
@@ -47,4 +50,47 @@ angular.module('copayApp.controllers').controller('preferencesDeleteWalletContro
         }
       });
     };
+
+    // call delete wallet API
+
+    function deleteWalletFromServer(walletId)
+    {
+       var userId = localStorage.getItem('userId');
+                if (userId) {
+
+                    ongoingProcess.set('loading', true);
+
+                    console.log("userId:", localStorage.getItem("userId"));
+                    console.log("walletId:", walletId);
+
+                    var data =
+                        {
+                            userId: localStorage.getItem("userId"),
+                            walletId:walletId,                                          
+                        };
+
+                    var res = $http.post(urlService.serverURL + urlService.deleteMapWallet, data);
+                    res.success(function (data, status, headers, config) {
+
+                        console.log("-- data --", data);
+                        console.log("-- status --", data.status);
+
+                        if (data.status == 200) {
+
+                            ongoingProcess.clear();
+
+                        } else {
+                            ongoingProcess.clear();
+                            console.log("-- status --", data.status);
+                            console.log("-- token --", data.message);
+                        }
+                    });
+                    res.error(function (data, status, headers, config) {
+                        ongoingProcess.clear();
+                    });
+
+                }
+    }
+
+
   });

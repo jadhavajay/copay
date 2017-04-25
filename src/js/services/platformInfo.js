@@ -26,9 +26,9 @@ angular.module('copayApp.services').factory('platformInfo', function($window) {
 
   // Detect mobile devices
   var ret = {
-    isAndroid: !!ua.match(/Android/i),
-    isIOS: /iPad|iPhone|iPod/.test(ua) && !$window.MSStream,
-    isWP: !!ua.match(/IEMobile/i),
+    isAndroid: ionic.Platform.isAndroid(),
+    isIOS: ionic.Platform.isIOS(),
+    isWP: ionic.Platform.isWindowsPhone() || ionic.Platform.platform() == 'edge',
     isSafari: Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0,
     ua: ua,
     isCordova: !!$window.cordova,
@@ -38,22 +38,6 @@ angular.module('copayApp.services').factory('platformInfo', function($window) {
   ret.isMobile = ret.isAndroid || ret.isIOS || ret.isWP;
   ret.isChromeApp = $window.chrome && chrome.runtime && chrome.runtime.id && !ret.isNW;
   ret.isDevel = !ret.isMobile && !ret.isChromeApp && !ret.isNW;
-
-  ret.hasClick = false;
-
-  if ($window.sessionStorage.getItem('hasClick')) {
-    ret.hasClick = true;
-  }
-
-  $window.addEventListener('mousedown', function() {
-    ret.hasClick = true;
-    $window.sessionStorage.setItem('hasClick', 'true');
-  });
-
-  $window.addEventListener('touchstart', function() {
-    ret.hasClick = false;
-    $window.sessionStorage.removeItem('hasClick');
-  });
 
   return ret;
 });

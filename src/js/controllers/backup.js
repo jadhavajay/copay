@@ -3,6 +3,7 @@
 angular.module('copayApp.controllers').controller('backupController',
   function($scope, $timeout, $log, $state, $stateParams, $ionicHistory, lodash, profileService, bwcService, walletService, ongoingProcess, popupService, gettextCatalog, $ionicModal) {
     $scope.wallet = profileService.getWallet($stateParams.walletId);
+    console.log("Wallet...................",$stateParams.walletId);
     $scope.viewTitle = $scope.wallet.name || $scope.wallet.credentials.walletName;
     $scope.n = $scope.wallet.n;
     var keys;

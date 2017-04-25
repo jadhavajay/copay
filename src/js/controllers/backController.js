@@ -12,8 +12,21 @@ angular.module('copayApp.controllers').controller('backController', function($sc
   };
 
   $scope.onboardingMailSkip = function() {
-    if (!usePushNotifications) $state.go('onboarding.backupRequest');
-    else $state.go('onboarding.notifications');
+    // if (!usePushNotifications) $state.go('onboarding.backupRequest');
+    // else $state.go('onboarding.notifications');
+
+    // disable push notification and redirect to backup request page
+     var opts = {
+              pushNotifications: {
+                enabled: false
+              }
+            };
+            configService.set(opts, function(err) {
+              if (err) $log.warn(err);
+              $state.go('onboarding.backupRequest', {
+                walletId: $scope.walletId
+              });
+            });
   }
 
 });

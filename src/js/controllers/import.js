@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('importController',
-  function($scope, $timeout, $log, $state, $stateParams, $ionicHistory, $ionicScrollDelegate, profileService, configService, sjcl, ledger, trezor, derivationPathHelper, platformInfo, bwcService, ongoingProcess, walletService, popupService, gettextCatalog, appConfigService) {
+  function($scope, urlService,mapCoinSriWallet, $timeout, $log, $http, $state, $stateParams, $ionicHistory, $ionicScrollDelegate, profileService, configService, sjcl, ledger, trezor, derivationPathHelper, platformInfo, bwcService, ongoingProcess, walletService, popupService, gettextCatalog, appConfigService) {
 
     var reader = new FileReader();
     var defaults = configService.getDefaults();
@@ -348,6 +348,15 @@ angular.module('copayApp.controllers').controller('importController',
           if (err) $log.error(err);
         });
       }
+
+       // call map wallet API 
+    //   mapCoinSriWallet.mapCoinSriWalletAPI(wallet,2);
+    //    $ionicHistory.removeBackView();
+    //           $state.go('tabs.home', {
+    //             fromOnboarding: $stateParams.fromOnboarding
+    //           });
+    // };
+
       $ionicHistory.removeBackView();
       $state.go('tabs.home', {
         fromOnboarding: $stateParams.fromOnboarding

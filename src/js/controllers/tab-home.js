@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('tabHomeController',
-  function($rootScope, $timeout, $scope, $state, $stateParams, $ionicModal, $ionicScrollDelegate, $window, gettextCatalog, lodash, popupService, ongoingProcess, externalLinkService, latestReleaseService, profileService, walletService, configService, $log, platformInfo, storageService, txpModalService, appConfigService, startupService, addressbookService, feedbackService, bwcError, nextStepsService, buyAndSellService, homeIntegrationsService, bitpayCardService) {
+  function($rootScope,$http,$interval, $timeout, $scope, $state, $stateParams, $ionicModal, $ionicScrollDelegate, $window, gettextCatalog, lodash, popupService, ongoingProcess, externalLinkService, latestReleaseService, profileService, walletService, configService, $log, platformInfo, storageService, txpModalService, appConfigService,urlService, startupService, addressbookService, feedbackService, bwcError, nextStepsService, buyAndSellService, homeIntegrationsService, bitpayCardService, pushNotificationsService) {
+    
+    // RateAPICall();
     var wallet;
     var listeners = [];
     var notifications = [];
@@ -9,17 +11,71 @@ angular.module('copayApp.controllers').controller('tabHomeController',
     $scope.openTxpModal = txpModalService.open;
     $scope.version = $window.version;
     $scope.name = appConfigService.nameCase;
-    $scope.homeTip = $stateParams.fromOnboarding;
     $scope.isCordova = platformInfo.isCordova;
     $scope.isAndroid = platformInfo.isAndroid;
     $scope.isNW = platformInfo.isNW;
     $scope.showRateCard = {};
+
+
+    // $scope.buyBTCAmt = localStorage.getItem('buyBTCAmt')
+    $scope.buyINRAmt =  localStorage.getItem('buyINRAmt')
+
+    // $scope.sellBTCAmt = localStorage.getItem('sellBTCAmt')
+    $scope.sellINRAmt =   localStorage.getItem('sellINRAmt')
+
+    // copy code
+           
+    // $scope.RateAPICall(1);
+
+      $scope.RateAPICall =function(flag)
+      {
+        if(flag==1)
+        {
+          $scope.isClicked = true;
+        }
+        else
+        {
+          $scope.isClicked = true;
+        }
+            var res = $http.get(urlService.serverURL+urlService.getRateAPI);
+            res.success(function(data, status, headers, config) {
+                console.log("-- data --", data);
+                console.log("-- status --", data.status);
+
+                if (data.status == 200) 
+                {
+
+                  $scope.isClicked = false;       
+                  // $scope.buyBTCAmt = JSON.stringify(data.rateCard.buyRate.BTC);
+                  $scope.buyINRAmt = JSON.stringify(data.rateCard.buyRate.INR);              
+
+                  // localStorage.setItem("buyBTCAmt", data.rateCard.buyRate.BTC);
+                  localStorage.setItem("buyINRAmt", data.rateCard.buyRate.INR);
+                  
+                  // $scope.sellBTCAmt = JSON.stringify(data.rateCard.sellRate.BTC);
+                  $scope.sellINRAmt = JSON.stringify(data.rateCard.sellRate.INR);                
+
+                  // localStorage.setItem("sellBTCAmt", data.rateCard.sellRate.BTC);
+                  localStorage.setItem("sellINRAmt", data.rateCard.sellRate.INR);
+                                                
+                  }
+            });
+      }
+      setInterval(function(){
+      $scope.RateAPICall(0);
+      }, 10000)
+            
+
+
+                   
+    // copy code end
 
     $scope.$on("$ionicView.afterEnter", function() {
       startupService.ready();
     });
 
     $scope.$on("$ionicView.beforeEnter", function(event, data) {
+      
       if (!$scope.homeTip) {
         storageService.getHomeTipAccepted(function(error, value) {
           $scope.homeTip = (value == 'accepted') ? false : true;
@@ -105,16 +161,31 @@ angular.module('copayApp.controllers').controller('tabHomeController',
         $scope.bitpayCardItems = cards;
       });
 
-      configService.whenAvailable(function() {
-        var config = configService.getSync();
+      configService.whenAvailable(function(config) {
         $scope.recentTransactionsEnabled = config.recentTransactions.enabled;
         if ($scope.recentTransactionsEnabled) getNotifications();
 
         if (config.hideNextSteps.enabled) {
           $scope.nextStepsItems = null;
-        } else {
+        } 
+          else 
+        {
+          // Added code for My Order 
+           var userId = localStorage.getItem('userId');
+           if (userId) {
+              nextStepsService.register({
+                  title: 'My Orders',
+                  name: 'buyandsellorderhistory',
+                  icon: 'icon-gift',
+                  sref: 'tabs.buySellOrderHistory',
+            });
+          }
+          // Added code for My Order End 
+        
           $scope.nextStepsItems = nextStepsService.get();
         }
+
+        pushNotificationsService.init();
 
         $timeout(function() {
           $ionicScrollDelegate.resize();

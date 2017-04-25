@@ -138,3 +138,12 @@
   font-style: normal;
 
 }
+
+ // declare font style Ubuntu-Bold-Italic
+@font-face {
+  font-family: 'Ubuntu-Bold-Italic';
+  src: url('../roboto-font/ubuntu-bold-italic-webfont.woff2') format('woff2'),
+  url('ubuntu-bold-italic-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}

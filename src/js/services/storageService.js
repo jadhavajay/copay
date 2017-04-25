@@ -3,14 +3,19 @@ angular.module('copayApp.services')
   .factory('storageService', function(logHeader, fileStorageService, localStorageService, sjcl, $log, lodash, platformInfo, $timeout) {
 
     var root = {};
+    var storage;
 
     // File storage is not supported for writing according to
     // https://github.com/apache/cordova-plugin-file/#supported-platforms
     var shouldUseFileStorage = platformInfo.isCordova && !platformInfo.isWP;
-    $log.debug('Using file storage:', shouldUseFileStorage);
 
-
-    var storage = shouldUseFileStorage ? fileStorageService : localStorageService;
+    if (shouldUseFileStorage) {
+      $log.debug('Using: FileStorage');
+      storage = fileStorageService;
+    } else {
+      $log.debug('Using: LocalStorage');
+      storage = localStorageService;
+    }
 
     var getUUID = function(cb) {
       // TO SIMULATE MOBILE
@@ -247,6 +252,42 @@ angular.module('copayApp.services')
       storage.remove('glideraToken-' + network, cb);
     };
 
+    root.setGlideraPermissions = function(network, p, cb) {
+      storage.set('glideraPermissions-' + network, p, cb);
+    };
+
+    root.getGlideraPermissions = function(network, cb) {
+      storage.get('glideraPermissions-' + network, cb);
+    };
+
+    root.removeGlideraPermissions = function(network, cb) {
+      storage.remove('glideraPermissions-' + network, cb);
+    };
+
+    root.setGlideraStatus = function(network, status, cb) {
+      storage.set('glideraStatus-' + network, status, cb);
+    };
+
+    root.getGlideraStatus = function(network, cb) {
+      storage.get('glideraStatus-' + network, cb);
+    };
+
+    root.removeGlideraStatus = function(network, cb) {
+      storage.remove('glideraStatus-' + network, cb);
+    };
+
+    root.setGlideraTxs = function(network, txs, cb) {
+      storage.set('glideraTxs-' + network, txs, cb);
+    };
+
+    root.getGlideraTxs = function(network, cb) {
+      storage.get('glideraTxs-' + network, cb);
+    };
+
+    root.removeGlideraTxs = function(network, cb) {
+      storage.remove('glideraTxs-' + network, cb);
+    };
+
     root.setCoinbaseRefreshToken = function(network, token, cb) {
       storage.set('coinbaseRefreshToken-' + network, token, cb);
     };
@@ -281,18 +322,6 @@ angular.module('copayApp.services')
 
     root.removeAddressbook = function(network, cb) {
       storage.remove('addressbook-' + network, cb);
-    };
-
-    root.setNextStep = function(service, status, cb) {
-      storage.set('nextStep-' + service, status, cb);
-    };
-
-    root.getNextStep = function(service, cb) {
-      storage.get('nextStep-' + service, cb);
-    };
-
-    root.removeNextStep = function(service, cb) {
-      storage.remove('nextStep-' + service, cb);
     };
 
     root.setLastCurrencyUsed = function(lastCurrencyUsed, cb) {
@@ -356,14 +385,13 @@ angular.module('copayApp.services')
       storage.remove('balanceCache-' + cardId, cb);
     };
 
-    //   cards: [
-    //     eid: card id
-    //     id: card id
-    //     lastFourDigits: card number
-    //     token: card token
-    //   ]
+    // cards: [
+    //   eid: card id
+    //   id: card id
+    //   lastFourDigits: card number
+    //   token: card token
+    // ]
     root.setBitpayDebitCards = function(network, email, cards, cb) {
-
       root.getBitpayAccounts(network, function(err, allAccounts) {
         if (err) return cb(err);
 
@@ -385,7 +413,6 @@ angular.module('copayApp.services')
     //   email: account email
     // ]
     root.getBitpayDebitCards = function(network, cb) {
-
       root.getBitpayAccounts(network, function(err, allAccounts) {
         if (err) return cb(err);
 
@@ -393,27 +420,22 @@ angular.module('copayApp.services')
 
         lodash.each(allAccounts, function(account, email) {
 
-          // Add account's email to card list, for convenience
-          var cards = lodash.clone(account.cards);
-          lodash.each(cards, function(x) {
-            x.email = email;
-          });
+          if (account.cards) {
+            // Add account's email to each card
+            var cards = lodash.clone(account.cards);
+            lodash.each(cards, function(x) {
+              x.email = email;
+            });
 
-          allCards = allCards.concat(cards);
+            allCards = allCards.concat(cards);
+          }
         });
 
         return cb(null, allCards);
       });
     };
 
-    // card: {
-    //   eid: card id
-    //   id: card id
-    //   lastFourDigits: card number
-    //   token: card token
-    // }
     root.removeBitpayDebitCard = function(network, cardEid, cb) {
-
       root.getBitpayAccounts(network, function(err, allAccounts) {
 
         lodash.each(allAccounts, function(account) {
@@ -447,7 +469,7 @@ angular.module('copayApp.services')
       storage.get('bitpayAccounts-v2-' + network, function(err, allAccountsStr) {
         if (err) return cb(err);
 
-        if (!allAccountsStr) 
+        if (!allAccountsStr)
           return cb(null, {});
 
         var allAccounts = {};
@@ -489,30 +511,51 @@ angular.module('copayApp.services')
       });
     };
 
-
     // data: {
     //   email: account email
     //   token: account token
+    //   familyName: account family (last) name
+    //   givenName: account given (first) name
     // }
     root.setBitpayAccount = function(network, data, cb) {
-
       if (!lodash.isObject(data) || !data.email || !data.token)
         return cb('No account to set');
-
-      var email = data.email;
-      var token = data.token;
-
 
       root.getBitpayAccounts(network, function(err, allAccounts) {
         if (err) return cb(err);
 
-        var account = allAccounts[email] || {};
-        account.token = token;
+        allAccounts = allAccounts || {};
+        var account = allAccounts[data.email] || {};
+        account.token = data.token;
+        account.familyName = data.familyName;
+        account.givenName = data.givenName;
 
-        allAccounts[email] = account;
+        allAccounts[data.email] = account;
 
-        $log.info('Storing BitPay accounts with new account:' + email);
+        $log.info('Storing BitPay accounts with new account:' + data.email);
         storage.set('bitpayAccounts-v2-' + network, allAccounts, cb);
+      });
+    };
+
+    // account: {
+    //   email: account email
+    //   apiContext: the context needed for making future api calls
+    //   cards: an array of cards
+    // }
+    root.removeBitpayAccount = function(network, account, cb) {
+      if (lodash.isString(account)) {
+        account = JSON.parse(account);
+      }
+      account = account || {};
+      if (lodash.isEmpty(account)) return cb('No account to remove');
+      storage.get('bitpayAccounts-v2-' + network, function(err, bitpayAccounts) {
+        if (err) cb(err);
+        if (lodash.isString(bitpayAccounts)) {
+          bitpayAccounts = JSON.parse(bitpayAccounts);
+        }
+        bitpayAccounts = bitpayAccounts || {};
+        delete bitpayAccounts[account.email];
+        storage.set('bitpayAccounts-v2-' + network, JSON.stringify(bitpayAccounts), cb);
       });
     };
 

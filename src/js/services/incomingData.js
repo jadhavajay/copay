@@ -46,6 +46,26 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
       return true;
     }
 
+    function goSend(addr, amount, message) {
+      $state.go('tabs.send', {}, {
+        'reload': true,
+        'notify': $state.current.name == 'tabs.send' ? false : true
+      });
+      // Timeout is required to enable the "Back" button
+      $timeout(function() {
+        if (amount) {
+          $state.transitionTo('tabs.send.confirm', {
+            toAmount: amount,
+            toAddress: addr,
+            description: message
+          });
+        } else {
+          $state.transitionTo('tabs.send.amount', {
+            toAddress: addr
+          });
+        }
+      }, 100);
+    }
     // data extensions for Payment Protocol with non-backwards-compatible request
     if ((/^bitcoin:\?r=[\w+]/).exec(data)) {
       data = decodeURIComponent(data.replace('bitcoin:?r=', ''));
@@ -73,27 +93,13 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
 
       if (parsed.r) {
         payproService.getPayProDetails(parsed.r, function(err, details) {
+          if (err && addr && amount) {
+            goSend(addr, amount, message);
+          }
           handlePayPro(details);
         });
       } else {
-        $state.go('tabs.send', {}, {
-          'reload': true,
-          'notify': $state.current.name == 'tabs.send' ? false : true
-        });
-        // Timeout is required to enable the "Back" button
-        $timeout(function() {
-          if (amount) {
-            $state.transitionTo('tabs.send.confirm', {
-              toAmount: amount,
-              toAddress: addr,
-              description: message
-            });
-          } else {
-            $state.transitionTo('tabs.send.amount', {
-              toAddress: addr
-            });
-          }
-        }, 100);
+        goSend(addr, amount, message);
       }
       return true;
 
@@ -122,11 +128,25 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
         goToAmountPage(data);
       }
     } else if (data && data.indexOf(appConfigService.name + '://glidera') === 0) {
-      return $state.go('uriglidera', {
-        url: data
+      var code = getParameterByName('code', data);
+      $ionicHistory.nextViewOptions({
+        disableAnimate: true
       });
+      $state.go('tabs.home', {}, {
+        'reload': true,
+        'notify': $state.current.name == 'tabs.home' ? false : true
+      }).then(function() {
+        $ionicHistory.nextViewOptions({
+          disableAnimate: true
+        });
+        $state.transitionTo('tabs.buyandsell.glidera', {
+          code: code
+        });
+      });
+      return true;
+
     } else if (data && data.indexOf(appConfigService.name + '://coinbase') === 0) {
-      var code = getParameterByName('code', data); 
+      var code = getParameterByName('code', data);
       $ionicHistory.nextViewOptions({
         disableAnimate: true
       });
@@ -145,6 +165,10 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
 
       // BitPayCard Authentication
     } else if (data && data.indexOf(appConfigService.name + '://') === 0) {
+
+      // Disable BitPay Card
+      if (!appConfigService._enabledExtensions.debitcard) return false;
+
       var secret = getParameterByName('secret', data);
       var email = getParameterByName('email', data);
       var otp = getParameterByName('otp', data);
@@ -156,13 +180,14 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
       }).then(function() {
         switch (reason) {
           default:
-          case '0': /* For BitPay card binding */
+            case '0':
+            /* For BitPay card binding */
             $state.transitionTo('tabs.bitpayCardIntro', {
               secret: secret,
               email: email,
               otp: otp
             });
-            break;
+          break;
         }
       });
       return true;
@@ -195,8 +220,15 @@ angular.module('copayApp.services').factory('incomingData', function($log, $stat
         data: data,
         type: 'privateKey'
       });
-    } else {
+    } else if (data && ((data.substring(0, 2) == '1|') || (data.substring(0, 2) == '2|') || (data.substring(0, 2) == '3|'))) {
+      $state.go('tabs.home').then(function() {
+        $state.transitionTo('tabs.add.import', {
+          code: data
+        });
+      });
+      return true;
 
+    } else {
       if ($state.includes('tabs.scan')) {
         root.showMenu({
           data: data,

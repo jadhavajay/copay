@@ -1,15 +1,11 @@
-<ion-view id="tab-home">
+<ion-view id="tab-home" ng-init="RateAPICall(1)">
   <ion-nav-bar class="bar-royal">
-    <ion-nav-title><img class="tab-home__logo" src="img/app/logo-negative.svg"></ion-nav-title>
+    <ion-nav-title class="home-name-coinsri">CoinSri</ion-nav-title>
   </ion-nav-bar>
 
   <ion-content>
-    <ion-refresher
-     ng-if="isAndroid"
-     pulling-icon="ion-ios-refresh"
-     spinner="ios-small"
-     on-refresh="onRefresh()">
-   </ion-refresher>
+    <ion-refresher ng-if="isAndroid" pulling-icon="ion-ios-refresh" spinner="ios-small" on-refresh="onRefresh()">
+    </ion-refresher>
     <div class="list card release ng-hide" ng-show="newRelease">
       <i class="item icon big-icon-svg">
         <img src="img/icon-update.svg" class="bg"/>
@@ -21,8 +17,23 @@
         <span translate>Download</span>
       </div>
     </div>
-
     <div class="ng-hide" ng-show="showRateCard.value" ng-include="'views/feedback/rateCard.html'"></div>
+    <div class="list card homeTip" ng-click="RateAPICall(1)">
+        <div class="widthClass">
+          <div class="buyRateStyle">
+            <h8 class="title">Buy</h8></br>
+            <h8 class="title">Ƀ {{buyBTCAmt}} = ₹ {{buyINRAmt}}</h8>
+          </div>
+          <div class="sellRateStyle">
+          <div class="verticleLine">
+            <ion-spinner class="spinner-dark" icon="crescent" ng-show="isClicked"></ion-spinner>
+          </div>
+          <h8 class="title">Sell</h8></br>
+            <h8 class="title">Ƀ {{sellBTCAmt}} = ₹ {{sellINRAmt}}</h8>
+          </div>
+      </div>
+    </div>
+
     <div class="list card homeTip" ng-if="homeTip">
       <div class="item item-icon-right item-heading">
         <a ng-click="hideHomeTip()"><i class="icon ion-ios-close-empty close-home-tip"></i></a>
@@ -70,36 +81,35 @@
       </div>
       <div>
         <a ng-if="!wallets[0]" ui-sref="tabs.add" class="item item-icon-left item-big-icon-left item-icon-right next-step">
-         <i class="icon big-icon-svg">
+          <i class="icon big-icon-svg">
            <img src="img/icon-wallet.svg" class="bg wallet icon-create-wallet"/>
          </i>
           <span translate>Create bitcoin wallet</span>
           <i class="icon bp-arrow-right"></i>
         </a>
-        <a ng-repeat="wallet in wallets track by $index"
-           class="item item-sub item-icon-left item-big-icon-left item-icon-right wallet"
-           ng-click="openWallet(wallet)">
+        <a ng-repeat="wallet in wallets track by $index" class="item item-sub item-icon-left item-big-icon-left item-icon-right wallet"
+          ng-click="openWallet(wallet)">
           <i class="icon big-icon-svg">
-            <img src="img/icon-wallet.svg" ng-style="{'background-color': wallet.color}" class="bg wallet"/>
+            <img src="img/icon-wallet.svg" ng-class="{'wallet-background-color-default': !wallet.color}" ng-style="{'background-color': wallet.color}" class="bg wallet"/>
           </i>
           <span>
             {{wallet.name || wallet.id}}
           </span>
           <p>
-          <span ng-if="!wallet.isComplete()" class="assertive" translate>
+            <span ng-if="!wallet.isComplete()" class="assertive" translate>
             Incomplete
           </span>
-          <span ng-if="wallet.isComplete()">
+            <span ng-if="wallet.isComplete()">
             <span ng-if="!wallet.balanceHidden"> {{wallet.status.totalBalanceStr ? wallet.status.totalBalanceStr : ( wallet.cachedBalance ? wallet.cachedBalance   + (wallet.cachedBalanceUpdatedOn ? ' &middot; ' + ( wallet.cachedBalanceUpdatedOn  * 1000 | amTimeAgo) : '') : ''  ) }} </span>
-            
+
             <span ng-if="wallet.balanceHidden" translate>[Balance Hidden]</span>
             <span class="tab-home__wallet__multisig-number" ng-if="wallet.n > 1">
               {{wallet.m}}-of-{{wallet.n}}
             </span>
             <i ng-if="!wallet.balanceHidden && (wallet.status.totalBalanceSat != wallet.status.spendableAmount)" class="tab-home__wallet__status-icon ion-ios-timer-outline"></i>
             <span class="assertive" ng-if="wallet.error">{{wallet.error}}</span>
-          </span>
-          &nbsp;
+            </span>
+            &nbsp;
           </p>
           <i class="icon bp-arrow-right"></i>
         </a>

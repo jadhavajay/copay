@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('createController',
-  function($scope, $rootScope, $timeout, $log, lodash, $state, $ionicScrollDelegate, $ionicHistory, profileService, configService, gettextCatalog, ledger, trezor, platformInfo, derivationPathHelper, ongoingProcess, walletService, storageService, popupService, appConfigService) {
+  function($scope, $rootScope, $timeout, $log, lodash, $state, $ionicScrollDelegate,urlService, $ionicHistory, profileService, configService, gettextCatalog, ledger, trezor, platformInfo, derivationPathHelper, ongoingProcess, walletService, storageService, popupService, appConfigService) {
 
     var isChromeApp = platformInfo.isChromeApp;
     var isCordova = platformInfo.isCordova;
@@ -197,6 +197,12 @@ angular.module('copayApp.controllers').controller('createController',
             profileService.setBackupFlag(client.credentials.walletId);
           }
 
+          console.log("-- Wallet --", client);
+          console.log("-- Wallet copayerId --", client.credentials.copayerId);
+          console.log("-- Wallet walletId --", client.credentials.walletId);
+          console.log("-- Wallet xPubKey --", client.credentials.xPubKey);
+          console.log("-- Wallet walletName --", client.credentials.walletName);
+
           $ionicHistory.removeBackView();
 
           if (!client.isComplete()) {
@@ -209,8 +215,14 @@ angular.module('copayApp.controllers').controller('createController',
                 walletId: client.credentials.walletId
               });
             }, 100);
-          } else $state.go('tabs.home');
+          }
+           else
+           {
+           // call map wallet API 
+            // mapCoinSriWallet.mapCoinSriWalletAPI(client,1);
+            // $state.go('tabs.home');
+           }
         });
-      }, 100);
+      }, 300);
     }
   });

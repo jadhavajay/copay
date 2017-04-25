@@ -26,7 +26,7 @@ angular.module('copayApp.controllers').controller('buyAmazonController', functio
     popupService.showAlert(msg, err);
   };
 
-  var publishAndSign = function (wallet, txp, onSendStatusChange, cb) {
+  var publishAndSign = function(wallet, txp, onSendStatusChange, cb) {
     if (!wallet.canSign() && !wallet.isPrivKeyExternal()) {
       var err = 'No signing proposal: No private key';
       $log.info(err);
@@ -39,9 +39,9 @@ angular.module('copayApp.controllers').controller('buyAmazonController', functio
     }, onSendStatusChange);
   };
 
-  var statusChangeHandler = function (processName, showName, isOn) {
+  var statusChangeHandler = function(processName, showName, isOn) {
     $log.debug('statusChangeHandler: ', processName, showName, isOn);
-    if ( processName == 'buyingGiftCard' && !isOn) {
+    if (processName == 'buyingGiftCard' && !isOn) {
       $scope.sendStatus = 'success';
       $timeout(function() {
         $scope.$digest();
@@ -111,10 +111,14 @@ angular.module('copayApp.controllers').controller('buyAmazonController', functio
 
     $scope.network = amazonService.getNetwork();
     $scope.wallets = profileService.getWallets({
-      m: 1, // Only 1-signature wallet
       onlyComplete: true,
-      network: $scope.network
+      network: $scope.network,
+      hasFunds: true
     });
+    if (lodash.isEmpty($scope.wallets)) {
+      showErrorAndBack('No wallets with funds');
+      return;
+    }
     $scope.wallet = $scope.wallets[0]; // Default first wallet
   });
 
@@ -141,7 +145,13 @@ angular.module('copayApp.controllers').controller('buyAmazonController', functio
       amazonService.createBitPayInvoice(dataSrc, function(err, dataInvoice) {
         if (err) {
           ongoingProcess.set('buyingGiftCard', false, statusChangeHandler);
-          showError('Error creating BitPay invoice', err);
+
+          if (err && err.message && err.message.match(/suspended/i)) {
+            showError('Service not available', 'Amazon Gift Card Service is not available at this moment. Please try back later.');
+          } else {
+            showError('Could not access Gift Card Service', err);
+          };
+
           return;
         }
 
@@ -250,7 +260,9 @@ angular.module('copayApp.controllers').controller('buyAmazonController', functio
         disableAnimate: true
       });
       $state.transitionTo('tabs.giftcards.amazon').then(function() {
-        $state.transitionTo('tabs.giftcards.amazon.cards', { cardClaimCode: claimCode });
+        $state.transitionTo('tabs.giftcards.amazon.cards', {
+          cardClaimCode: claimCode
+        });
       });
     });
   };

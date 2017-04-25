@@ -10,7 +10,7 @@
   This class lets interfaces with BitPay's exchange rate API.
 */
 
-var RateService = function(opts) {
+var RateService = function (opts) {
   var self = this;
 
   opts = opts || {};
@@ -32,39 +32,44 @@ var RateService = function(opts) {
 
 
 var _instance;
-RateService.singleton = function(opts) {
+RateService.singleton = function (opts) {
   if (!_instance) {
     _instance = new RateService(opts);
   }
   return _instance;
 };
 
-RateService.prototype._fetchCurrencies = function() {
+RateService.prototype._fetchCurrencies = function () {
   var self = this;
 
   var backoffSeconds = 5;
   var updateFrequencySeconds = 5 * 60;
   var rateServiceUrl = 'https://bitpay.com/api/rates';
 
-  var retrieve = function() {
+  var retrieve = function () {
     //log.info('Fetching exchange rates');
-    self.httprequest.get(rateServiceUrl).success(function(res) {
-      self.lodash.each(res, function(currency) {
+    self.httprequest.get(rateServiceUrl).success(function (res) {
+      self.lodash.each(res, function (currency) {
         self._rates[currency.code] = currency.rate;
-        self._alternatives.push({
-          name: currency.name,
-          isoCode: currency.code,
-          rate: currency.rate
-        });
+
+        // set INR and USD in altCurrency
+        if (currency.code === "USD" || currency.code === "INR") {
+          self._rates[currency.code] = currency.rate;
+          self._alternatives.push({
+            name: currency.name,
+            isoCode: currency.code,
+            rate: currency.rate
+          });
+        }
       });
       self._isAvailable = true;
-      self.lodash.each(self._queued, function(callback) {
+      self.lodash.each(self._queued, function (callback) {
         setTimeout(callback, 1);
       });
       setTimeout(retrieve, updateFrequencySeconds * 1000);
-    }).error(function(err) {
+    }).error(function (err) {
       //log.debug('Error fetching exchange rates', err);
-      setTimeout(function() {
+      setTimeout(function () {
         backoffSeconds *= 1.5;
         retrieve();
       }, backoffSeconds * 1000);
@@ -76,19 +81,19 @@ RateService.prototype._fetchCurrencies = function() {
   retrieve();
 };
 
-RateService.prototype.getRate = function(code) {
+RateService.prototype.getRate = function (code) {
   return this._rates[code];
 };
 
-RateService.prototype.getAlternatives = function() {
+RateService.prototype.getAlternatives = function () {
   return this._alternatives;
 };
 
-RateService.prototype.isAvailable = function() {
+RateService.prototype.isAvailable = function () {
   return this._isAvailable;
 };
 
-RateService.prototype.whenAvailable = function(callback) {
+RateService.prototype.whenAvailable = function (callback) {
   if (this.isAvailable()) {
     setTimeout(callback, 1);
   } else {
@@ -96,7 +101,7 @@ RateService.prototype.whenAvailable = function(callback) {
   }
 };
 
-RateService.prototype.toFiat = function(satoshis, code) {
+RateService.prototype.toFiat = function (satoshis, code) {
   if (!this.isAvailable()) {
     return null;
   }
@@ -104,34 +109,34 @@ RateService.prototype.toFiat = function(satoshis, code) {
   return satoshis * this.SAT_TO_BTC * this.getRate(code);
 };
 
-RateService.prototype.fromFiat = function(amount, code) {
+RateService.prototype.fromFiat = function (amount, code) {
   if (!this.isAvailable()) {
     return null;
   }
   return amount / this.getRate(code) * this.BTC_TO_SAT;
 };
 
-RateService.prototype.listAlternatives = function(sort) {
+RateService.prototype.listAlternatives = function (sort) {
   var self = this;
   if (!this.isAvailable()) {
     return [];
   }
 
-  var alternatives = self.lodash.map(this.getAlternatives(), function(item) {
+  var alternatives = self.lodash.map(this.getAlternatives(), function (item) {
     return {
       name: item.name,
       isoCode: item.isoCode
     }
   });
   if (sort) {
-    alternatives.sort(function(a, b) {
+    alternatives.sort(function (a, b) {
       return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
     });
   }
   return self.lodash.uniq(alternatives, 'isoCode');
 };
 
-angular.module('copayApp.services').factory('rateService', function($http, lodash) {
+angular.module('copayApp.services').factory('rateService', function ($http, lodash) {
   // var cfg = _.extend(config.rates, {
   //   httprequest: $http
   // });

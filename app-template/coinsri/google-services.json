@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "674517163005",
+    "firebase_url": "https://coinsri-19d11.firebaseio.com",
+    "project_id": "coinsri-19d11",
+    "storage_bucket": "coinsri-19d11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:674517163005:android:66939f91ddae75e7",
+        "android_client_info": {
+          "package_name": "com.coinsri.wallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "674517163005-kimpegl60ct0t4f6tgioifse10ef2m15.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATtJ8FD_eFzODYv2ud5005_0rBIS70Eso"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

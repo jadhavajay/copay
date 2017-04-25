@@ -1,0 +1,79 @@
+<ion-view id="tab-receive" tab-receive>
+  <ion-nav-bar class="bar-royal">
+    <ion-nav-title>
+      <!--Buy-->
+      {{buySell}}
+    </ion-nav-title>
+    <ion-nav-back-button>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+
+  <ion-content class="tx-details-content">
+    <div class="list">
+      <div class="item">
+
+      </div>
+      <div class="item single-line" ng-if="btx.action != 'received'">
+        <span class="label" translate>Order Id</span>
+        <span class="item-note">
+          <span ng-bind-html="transactionId" ng-show="!btx.confirmations || btx.confirmations == 0" translate>
+              {{transactionId}}
+            </span>
+        </span>
+      </div>
+      <div class="item single-line" ng-if="btx.action != 'received'">
+        <span class="label" translate>Date</span>
+        <span class="item-note">
+          <span ng-bind-html="dateTime" ng-show="!btx.confirmations || btx.confirmations == 0" translate>
+              {{dateTime}}
+            </span>
+        </span>
+      </div>
+
+      <div class="item single-line">
+        <span class="label" translate>BTC</span>
+        <span class="item-note">
+            <span ng-bind-html="amount" ng-show="!btx.confirmations || btx.confirmations == 0" translate>
+              {{amount}}
+            </span>
+        </span>
+      </div>
+
+      <div class="item single-line">
+        <span class="label" translate>INR</span>
+        <span class="item-note">
+            <span ng-bind-html="INRAmount" ng-show="!btx.confirmations || btx.confirmations == 0" translate>
+              {{INRAmount}}
+            </span>
+        </span>
+      </div>
+
+
+      <div class="item single-line">
+        <span class="label" translate>Status</span>
+        <span class="item-note">
+            <span ng-bind-html="status" ng-show="!btx.confirmations || btx.confirmations == 0" translate>
+              {{status}}
+            </span>
+        </span>
+      </div>
+      <div class="item single-line" ng-show="showPaymentReferanceText">
+        <span class="label" translate>{{paymentReferanceListView}}</span>
+        <span class="item-note">
+            <span ng-bind-html="paymentReferance" ng-show="!btx.confirmations || btx.confirmations == 0" translate>
+              {{paymentReferance}}
+            </span>
+        </span>
+      </div>
+
+    </div>
+
+    </div>
+
+    <button class="view-on-blockchain-btn button button-standard button-primary" ng-show="paymentReferanceButton" ng-click="openPopup()"
+      translate>
+      {{addPaymentReference}}
+    </button>
+
+  </ion-content>
+</ion-view>

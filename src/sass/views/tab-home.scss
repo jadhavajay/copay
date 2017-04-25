@@ -4,7 +4,8 @@
     background-color: #4A90E2; // default wallet color
   }
   .icon-buy-bitcoin {
-    background-image: url("../img/icon-bitcoin.svg");
+    background-image: $v-bitcoin-icon;
+    background-color: $v-bitcoin-orange;
   }
   .icon-bitpay-card {
     background-image: url("../img/icon-card.svg");
@@ -12,6 +13,8 @@
   }
   .icon-gift {
     background-image: url("../img/icon-gift.svg");
+    background-color: $v-bitcoin-orange;
+
   }
   .icon-amazon {
     background-image: url("../img/icon-amazon.svg");
@@ -21,9 +24,50 @@
       padding: .25rem
     }
   }
+
+.widthClass{
+  width: 100%;
+  height: 60px;
+}
+.buyRateStyle {
+  width: 50%;
+  font-size: 15px;
+  margin-top: 10px;
+  text-align: center; 
+  float: left;
+  font-weight: bold;
+  color: $v-dark-gray;
+}
+
+// .verticleDiv{
+//     display: flex;
+//       justify-content: center;
+
+// }
+
+.sellRateStyle {
+  width: 50%;
+  font-size: 15px;
+  margin-top: 10px;
+  text-align: center;
+  float: right;
+  font-weight: bold;
+  color: $v-dark-gray;
+}
+.verticleLine {
+      text-align: center;
+      margin-top: 8px;
+      float: left; 
+}
+
+.spinner svg {
+      stroke: green;
+      fill: green;
+    }
+
   .card {
     .item {
-      color: #444;
+      color:black;
       border-top:none;
       padding-bottom: 1rem;
       padding-top:1rem;
@@ -66,6 +110,8 @@
     padding-top: 27px;
     padding-bottom: 27px;
   }
+
+
   .homeTip {
     text-align: center;
     & > .item-heading {
@@ -78,14 +124,14 @@
     & > .title {
       font-size: 20px;
       font-weight: bold;
-      color: $dark-gray;
+      color: $v-dark-gray;
       margin: 20px 10px;
     }
     & > .subtitle {
       font-size: 1rem;
       line-height: 1.5em;
       font-weight: 300;
-      color: $dark-gray;
+      color: $v-dark-gray;
       margin: 20px 3em 2.5em;
     }
     .big-icon-svg{
@@ -109,14 +155,14 @@
       &__multisig-number {
         font-size: .8rem;
         font-weight: 300;
-        color: $light-gray;
+        color: $v-light-gray;
       }
       &__status-icon {
         font-size: 18px;
         margin-left: 5px;
         position: relative;
         top: 1px;
-        color: $light-gray;
+        color: $v-light-gray;
       }
     }
   }
@@ -144,5 +190,12 @@
 
   .badge {
     top:11px;
+  }
+
+  .home-name-coinsri
+  {
+    font-family: "Ubuntu-Bold-Italic";
+    font-size: 20px;
+    color: #FFFFFF;
   }
 }

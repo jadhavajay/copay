@@ -1,0 +1,19 @@
+<ion-view id="onboard-welcome" class="onboarding">
+    <ion-content ng-init="createProfile()" scroll="false">
+        <div id="logo-tagline">
+            <!--<img src='img/bitpay-logo.svg' id="logo" />-->
+
+            <h1 class="onboarding-name-coinsri">CoinSri</h1>
+            <p id="lead" translate>Own Bitcoins, Peacefully.</p>
+            <div id="cta-buttons">
+                <button class="button button-standard button-primary" id="signup" href ui-sref="onboarding.emailRegister" translate>Signup</button>
+                <button class="button button-standard button-primary" id="login" href ui-sref="onboarding.login" translate>Login</button>
+                <button class="button button-standard button-secondary button-clear" id="restore" ng-click="checkSkip()">Skip</button>
+                <!--<button class="button button-standard button-secondary button-clear" id="restore" translate href ng-click="takePicture()">Skip</button>-->
+            
+                <!--<button class="button button-standard button-secondary button-clear" id="restore" translate href ui-sref="onboarding.emailRegister">Demo </button>-->
+            </div>
+        </div>
+        
+    </ion-content>
+</ion-view>

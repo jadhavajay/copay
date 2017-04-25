@@ -1,0 +1,30 @@
+<ion-view id="onboard-signup" class="onboarding">
+  <ion-content ng-controller="welcomeController" scroll="true">
+    <ion-nav-bar>
+      <ion-nav-title></ion-nav-title>
+      <ion-nav-buttons side="primary">
+        <button class="button back-button button-clear" ng-show="backButton" ng-click="Back()">
+        <i class="icon ion-ios-arrow-thin-left"></i>
+      </button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+
+    <div id="logo-tagline">
+      <h1 class="onboarding-name-coinsri">Sign-Up</h1>
+      <div class="list list-inset">
+        <label class="item item-input">
+              <input type="text" placeholder="First Name" ng-model="data.firstName">
+          </label>
+      </div>
+      <div class="list list-inset">
+        <label class="item item-input">
+              <input type="text" placeholder="Last Name" ng-model="data.lastName">
+          </label>
+      </div>
+      <div class="error-background" ng-show="errorMessage">
+        <label  for="MyField">{{ validationErrorLabel }}</label>
+      </div>
+      <button class="button button-standard button-primary" ng-click="nameEntry()">Done</button>
+    </div>
+  </ion-content>
+</ion-view>

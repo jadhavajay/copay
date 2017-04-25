@@ -1,0 +1,36 @@
+<ion-view id="onboard-signup" class="onboarding">
+  <ion-content ng-controller="welcomeController">
+    <ion-nav-bar>
+      <ion-nav-title></ion-nav-title>
+      <ion-nav-buttons side="primary">
+      <button class="button back-button button-clear" ng-click="goBack()">
+        <i class="icon ion-ios-arrow-thin-left"></i>
+      </button>
+    </ion-nav-buttons>
+    </ion-nav-bar>
+
+    <div id="logo-tagline">
+      <h1 class="onboarding-name-coinsri">Login</h1>
+
+      <div class="list list-inset">
+        <label class="item item-input">
+              <input type="text" placeholder="Email" ng-model="data.userName" ng-required="required">
+          </label>
+      </div>
+      <div class="list list-inset">
+        <label class="item item-input">
+              <input type="password" placeholder="Password" ng-model="data.password" ng-required="required">
+          </label>
+      </div>
+      <div class="error-background" ng-show="errorMessage">
+        <label for="MyField">{{ validationErrorLabel }}</label>
+      </div>
+      <button class="button button-standard button-primary" ng-click="login()">Login</button>
+    
+      <button class="button button-standard button-secondary button-clear" id="restore" ng-click="signup()">Skip</button>
+    <span class="signup-onLogin">
+      <button class="button button-secondary button-clear" id="restore" href ui-sref="onboarding.emailRegister">Sign-Up</button>
+    </span>
+    </div>
+  </ion-content>
+</ion-view>

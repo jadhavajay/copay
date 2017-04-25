@@ -9,13 +9,14 @@
 @import "tab-scan";
 @import "tab-send";
 @import "tab-settings";
+@import "wallet-colors";
 @import "walletBalance";
 @import "walletDetails";
 @import "advancedSettings";
 @import "bitpayCard";
 @import "bitpayCardIntro";
-@import "bitpayCardPreferences";
 @import "buyandsell";
+@import "bitpayServicesPreferences";
 @import "address-book";
 @import "addresses";
 @import "wallet-backup-phrase";
@@ -42,5 +43,8 @@
 @import "includes/tx-status";
 @import "includes/itemSelector";
 @import "includes/walletSelector";
+@import "includes/accountSelector";
 @import "integrations/integrations";
 @import "custom-amount";
+@import "pin";
+@import "lockedView";

@@ -6,13 +6,6 @@
   <ion-content>
     <div class="settings-list list">
       <div class="item item-divider"></div>
-      <a class="ng-hide item item-icon-left item-icon-right" ng-hide="true">
-        <i class="icon big-icon-svg">
-          <img src="img/icon-exchange.svg" class="bg"/>
-        </i>
-        <span>{{'Bitcoin Exchanges' | translate}}</span>
-        <i class="icon bp-arrow-right"></i>
-      </a>
       <a class="item item-icon-left item-icon-right" ui-sref="tabs.addressbook">
         <i class="icon big-icon-svg">
           <img src="img/icon-address-book.svg" class="bg"/>
@@ -20,7 +13,16 @@
         <span>{{'Address Book' | translate}}</span>
         <i class="icon bp-arrow-right"></i>
       </a>
-      <a class="item item-icon-left item-icon-right" ng-click="openExternalLink()">
+
+       <a class="item item-icon-left item-icon-right" ng-show="showProfile" ui-sref="tabs.myProfile">
+        <i class="icon big-icon-svg">
+          <img src="img/icon-address-book.svg" class="bg"/>
+        </i>
+        <span>{{'My Profile' | translate}}</span>
+        <i class="icon bp-arrow-right"></i>
+      </a>
+
+      <!--<a class="item item-icon-left item-icon-right" ng-click="openExternalLink()">
         <i class="icon big-icon-svg">
           <img src="img/icon-help-support.svg" class="bg"/>
         </i>
@@ -35,12 +37,12 @@
         </i>
         <span>{{'Send Feedback' | translate}}</span>
         <i class="icon bp-arrow-right"></i>
-      </a>
+      </a>-->
       <a ng-if="isCordova" class="item item-icon-left item-icon-right" ui-sref="tabs.shareApp({score: 4, skipped: true, fromSettings: true})">
         <i class="icon big-icon-svg">
           <img src="img/icon-heart.svg" class="bg"/>
         </i>
-        <span>{{'Share'|translate}} {{appName}}</span>
+        <span translate>Share {{appName}}</span>
         <i class="icon bp-arrow-right"></i>
       </a>
 
@@ -53,7 +55,7 @@
         <span>{{'Notifications' | translate}}</span>
         <i class="icon bp-arrow-right"></i>
       </a>
-      <a class="item has-setting-value item-icon-left item-icon-right" ui-sref="tabs.language">
+      <!--<a class="item has-setting-value item-icon-left item-icon-right" ui-sref="tabs.language">
        <i class="icon big-icon-svg">
          <img src="img/icon-language.svg" class="bg"/>
        </i>
@@ -62,7 +64,7 @@
          {{currentLanguageName|translate}}
        </span>
        <i class="icon bp-arrow-right"></i>
-     </a>
+     </a>-->
       <a class="item has-setting-value item-icon-left item-icon-right" ui-sref="tabs.unit">
         <i class="icon big-icon-svg">
           <img src="img/icon-unit.svg" class="bg"/>
@@ -96,13 +98,23 @@
         <i class="icon bp-arrow-right"></i>
       </a>
 
+      <a class="item has-setting-value item-icon-left item-icon-right" ui-sref="tabs.lock" ng-if="isCordova || isDevel">
+        <i class="icon ion-ios-locked-outline" ng-if="locked"></i>
+        <i class="icon ion-ios-unlocked-outline" ng-if="!locked"></i>
+        <span class="setting-title">{{'Lock App' | translate}}</span>
+        <span class="setting-value">
+          {{method}}
+        </span>
+        <i class="icon bp-arrow-right"></i>
+      </a>
+
       <div class="item item-divider" ng-show="wallets[0]">{{'Wallets & Integrations' | translate}}</div>
 
       <a class="item item-icon-left item-icon-right" href
            ui-sref="tabs.preferences({'walletId': item.id})"
            ng-repeat="item in wallets track by $index">
          <i class="icon big-icon-svg circle">
-          <img src="img/icon-wallet.svg" ng-style="{'background-color': item.color}" class="bg"/>
+          <img src="img/icon-wallet.svg" ng-class="{'wallet-background-color-default': !item.color}" ng-style="{'background-color': item.color}" class="bg"/>
         </i>
         <span>
           {{item.name || item.id}}
@@ -113,16 +125,19 @@
         <span class="right text-light assertive" ng-show="!item.isComplete()">
           {{'Incomplete' | translate}}
         </span>
+        <span class="right text-light assertive" ng-show="item.isComplete() && item.needsBackup">
+          {{'Backup needed' | translate}}
+        </span>
         <i class="icon bp-arrow-right"></i>
       </a>
 
       <a class=" item item-icon-left item-icon-right"
-         ng-if="bitpayCards"
-         ui-sref="tabs.preferences.bitpayCard">
+         ng-if="bitpayAccounts || bitpayCards"
+         ui-sref="tabs.preferences.bitpayServices">
         <i class="icon big-icon-svg circle">
-          <div class="bg icon-bitpay-card"></div>
+          <div class="bg icon-bitpay"></div>
         </i>
-        <span>BitPay Visa&reg; Card</span>
+        <span>BitPay</span>
         <i class="icon bp-arrow-right"></i>
       </a>
 
@@ -150,6 +165,14 @@
         <span>{{'About' | translate}}</span> {{appName}}
         <i class="icon bp-arrow-right"></i>
       </a>
+
+      <a class="item item-icon-left item-icon-right" ng-show="userLogout" ng-click="logout()">
+        <i class="icon ion-log-out">
+        </i>
+        <span>{{'Logout' | translate}}</span>
+        <i class="icon bp-arrow-right"></i>
+      </a>
+
       <div class="item item-divider"></div>
     </div>
   </ion-content>

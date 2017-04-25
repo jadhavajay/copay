@@ -2,10 +2,16 @@
 
 angular.module('copayApp.controllers').controller('welcomeController', function($scope, $state, $timeout, $ionicConfig, $log, profileService, startupService, storageService) {
 
-  $ionicConfig.views.swipeBackEnabled(false);
-
-  $scope.$parent.$on("$ionicView.afterEnter", function() {
+  $scope.$on("$ionicView.afterEnter", function() {
     startupService.ready();
+  });
+
+  $scope.$on("$ionicView.enter", function() {
+    $ionicConfig.views.swipeBackEnabled(false);
+  });
+
+  $scope.$on("$ionicView.beforeLeave", function() {
+    $ionicConfig.views.swipeBackEnabled(true);
   });
 
   $scope.createProfile = function() {
@@ -14,5 +20,10 @@ angular.module('copayApp.controllers').controller('welcomeController', function(
       if (err) $log.warn(err);
     });
   };
+
+$scope.goBack = function() 
+ {
+      $state.go('onboarding.landing');
+ }
 
 });
