@@ -11,6 +11,8 @@ For a list of frequently asked questions please visit the [Copay FAQ](https://gi
 
 ## Main Features
 
+[![Join the chat at https://gitter.im/copay_26_04_2017/Lobby](https://badges.gitter.im/copay_26_04_2017/Lobby.svg)](https://gitter.im/copay_26_04_2017/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 - Multiple wallet creation and management in-app
 - Intuitive, multisignature security for personal or shared wallets
 - Easy spending proposal flow for shared wallets and group payments
